@@ -1,15 +1,17 @@
-function connectWallet() {
+import Web3 from 'web3';
+
+export default async function connectWallet() {
     if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.request({ method: 'eth_requestAccounts' })
-            .then(accounts => {
-                console.log('连接成功，当前账户:', accounts[0]);
-            })
-            .catch(error => {
-                console.error('连接失败:', error);
-            });
+        try {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            window.web3 = new Web3(window.ethereum); // 初始化 Web3 实例
+            return accounts[0];
+        } catch (error) {
+            console.error('连接钱包失败', error);
+            return null;
+        }
     } else {
-        console.log('请安装MetaMask!');
+        alert('请安装 MetaMask!');
+        return null;
     }
 }
-
-export default connectWallet;

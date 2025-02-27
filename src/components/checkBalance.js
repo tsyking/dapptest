@@ -1,18 +1,7 @@
-export const checkBalance = async (provider) => {
-    try {
-        const accounts = await provider.request({ method: 'eth_accounts' });
-        if (accounts.length === 0) {
-            throw new Error('请连接钱包');
-        }
+import Web3 from 'web3';
 
-        const balance = await provider.request({
-            method: 'eth_getBalance',
-            params: [accounts[0], 'latest'],
-        });
-
-        return parseFloat(balance) / Math.pow(10, 18); // 转换为以太币
-    } catch (error) {
-        console.error(error);
-        throw new Error('查询余额失败');
-    }
-};
+export default async function checkBalance(address) {
+    const web3 = new Web3(window.ethereum);
+    const balance = await web3.eth.getBalance(address);
+    return web3.utils.fromWei(balance, 'ether');
+}
