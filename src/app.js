@@ -58,14 +58,17 @@ window.addEventListener('load', async () => {
     let walletAddress;
 
     connectButton.addEventListener('click', async () => {
+        console.log('Connect button clicked');
         walletAddress = await connectWallet();
         if (walletAddress) {
+            console.log('Wallet connected:', walletAddress);
             const balance = await checkBalance(walletAddress);
             balanceSpan.innerText = balance;
         }
     });
 
     transferButton.addEventListener('click', async () => {
+        console.log('Transfer button clicked');
         const recipient = document.getElementById('recipient').value;
         const amount = document.getElementById('amount').value;
         if (!recipient || !amount) {
