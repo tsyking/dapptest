@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的DAPP项目</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <h1>欢迎来到我的DAPP项目</h1>
+        <button id="connectButton">连接MetaMask钱包</button>
+        <div id="balanceInfo"></div>
+        <div id="ethBalance">以太坊余额: <span id="balance">0</span> ETH</div>
+        <input type="text" id="recipient" placeholder="接收者地址">
+        <input type="number" id="amount" placeholder="转账金额">
+        <button id="transferButton">转账以太坊</button>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

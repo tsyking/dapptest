@@ -1,0 +1,22 @@
+{
+  "name": "my-dapp-project",
+  "version": "1.0.0",
+  "description": "A simple DApp to connect to MetaMask, check Ethereum balance, and transfer Ether.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "live-server src"
+  },
+  "dependencies": {
+    "ethers": "^5.6.9"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  },
+  "keywords": [
+    "DApp",
+    "Ethereum",
+    "MetaMask"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
