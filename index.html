@@ -7,10 +7,15 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <h1>我的DAPP项目</h1>
+        </div>
+        <div class="nav-right">
+            <button id="connectButton" class="btn">连接MetaMask钱包</button>
+        </div>
+    </nav>
     <div id="app">
-        <h1>欢迎来到我的DAPP项目</h1>
-        <button id="connectButton" class="btn">连接MetaMask钱包</button>
-        <div id="walletAddress" class="info-box">钱包地址: <span id="address">未连接</span></div>
         <div id="balanceInfo" class="info-box">
             <div id="ethBalance">以太坊余额: <span id="balance">0</span> ETH</div>
         </div>

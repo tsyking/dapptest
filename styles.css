@@ -1,10 +1,43 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    height: 100vh;
     margin: 0;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px; /* 调整导航条的高度 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.nav-left h1 {
+    margin: 0;
+    font-size: 20px; /* 调整标题的字体大小 */
+}
+
+.nav-right {
+    margin-right: 10px; /* 添加右边距 */
+}
+
+.nav-right .btn {
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+    padding: 8px 15px; /* 调整按钮的内边距 */
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nav-right .btn:hover {
+    background-color: #003f7f;
 }
 
 #app {
@@ -15,7 +48,7 @@ body {
     text-align: center;
     width: 90%;
     max-width: 400px;
-    margin-top: 0; /* 确保页面从顶部开始显示 */
+    margin: 80px auto 0; /* 确保内容不被导航条遮挡 */
 }
 
 h1 {
