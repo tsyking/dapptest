@@ -43,6 +43,10 @@ async function transferEther(to, amount) {
     }
 }
 
+function formatAddress(address) {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+}
+
 window.addEventListener('load', async () => {
     if (typeof window.ethereum !== 'undefined') {
         console.log('MetaMask is installed!');
@@ -54,7 +58,6 @@ window.addEventListener('load', async () => {
     const connectButton = document.getElementById('connectButton');
     const transferButton = document.getElementById('transferButton');
     const balanceSpan = document.getElementById('balance');
-    const addressSpan = document.getElementById('address');
 
     let walletAddress;
 
@@ -63,7 +66,7 @@ window.addEventListener('load', async () => {
         walletAddress = await connectWallet();
         if (walletAddress) {
             console.log('Wallet connected:', walletAddress);
-            addressSpan.innerText = walletAddress;
+            connectButton.innerText = formatAddress(walletAddress);
             const balance = await checkBalance(walletAddress);
             balanceSpan.innerText = balance;
         }
