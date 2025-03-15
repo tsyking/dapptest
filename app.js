@@ -1,87 +1,139 @@
-async function connectWallet() {
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            window.web3 = new Web3(window.ethereum); // 初始化 Web3 实例
-            return accounts[0];
-        } catch (error) {
-            console.error('连接钱包失败', error);
-            return null;
-        }
+// 初始化Web3
+let web3;
+const contractAddress = '0x11f2790DdCB3e48A2e20b64A1F7C3f605521Adea';
+let contractABI;
+
+// 同步加载ABI文件
+async function loadABI() {
+  try {
+    const response = await fetch('./abi.json');
+    if (!response.ok) throw new Error(`HTTP错误 ${response.status}`);
+    contractABI = await response.json();
+    await initApp();
+  } catch (error) {
+    console.error('ABI加载失败:', error);
+    alert(`加载ABI失败: ${error.message}`);
+  }
+}
+
+// 页面加载时立即加载ABI
+loadABI();
+
+// 自动连接钱包
+
+
+// 初始化应用
+function initApp() {
+  // 自动连接钱包
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    (async () => {
+      try {
+        await window.ethereum.enable();
+        const accounts = await web3.eth.getAccounts();
+        updateButtonState(true, accounts[0]);
+      } catch (error) {
+        console.error('用户拒绝连接');
+      }
+    })();
+  } else {
+    alert('请安装MetaMask!');
+  }
+
+  // 先移除旧的事件监听器
+  const newConnectButton = document.getElementById('connectButton').cloneNode(true);
+  document.getElementById('connectButton').replaceWith(newConnectButton);
+
+  // 连接按钮事件
+  newConnectButton.addEventListener('click', async () => {
+    if (web3 && web3.eth.accounts.wallet.length > 0) {
+      web3.eth.accounts.wallet.clear();
+      web3 = null;
+      updateButtonState(false);
+      addTransactionLog('已断开钱包连接');
     } else {
-        alert('请安装 MetaMask!');
-        return null;
+      await connectWallet();
     }
-}
-
-async function checkBalance(address) {
-    const web3 = new Web3(window.ethereum);
-    const balance = await web3.eth.getBalance(address);
-    return web3.utils.fromWei(balance, 'ether');
-}
-
-async function transferEther(to, amount) {
-    const web3 = new Web3(window.ethereum);
-    const accounts = await web3.eth.getAccounts();
-    const from = accounts[0];
-
-    const transactionParameters = {
-        to,
-        from,
-        value: web3.utils.toHex(web3.utils.toWei(amount, 'ether'))
-    };
-
+  });
+  
+  // 铸造按钮事件
+  document.getElementById('mintButton').addEventListener('click', async () => {
+    const amount = document.getElementById('mintAmount').value;
+    if (!amount || amount <= 0) {
+      alert('请输入有效数量');
+      return;
+    }
+    
     try {
-        await ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [transactionParameters],
-        });
-        return '转账成功';
+      const accounts = await web3.eth.getAccounts();
+      const contract = new web3.eth.Contract(contractABI, contractAddress);
+      const transaction = contract.methods.mint(web3.utils.toWei(amount, 'ether'));
+      
+      // 发送交易
+      const receipt = await transaction.send({ from: accounts[0] });
+      
+      // 更新界面
+      addTransactionLog(`成功铸造 ${amount} 代币`);
+      updateTotalMinted();
     } catch (error) {
-        console.error('转账失败', error);
-        return '转账失败';
+      console.error('铸造失败:', error);
+      alert('交易失败，请查看控制台');
     }
+  });
 }
 
-function formatAddress(address) {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+// 钱包连接函数
+async function connectWallet() {
+  try {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const accounts = await web3.eth.getAccounts();
+    updateButtonState(true, accounts[0]);
+    initApp();
+  } catch (error) {
+    console.error('连接失败:', error);
+  }
 }
 
-window.addEventListener('load', async () => {
-    if (typeof window.ethereum !== 'undefined') {
-        console.log('MetaMask is installed!');
-    } else {
-        alert('请安装 MetaMask!');
-        return;
-    }
+// 更新按钮状态
+function updateButtonState(connected, account) {
+  const button = document.getElementById('connectButton');
+  const formattedAddress = account && account.length >= 10 
+    ? `${account.slice(0,6)}...${account.slice(-4)}` 
+    : '连接钱包';
+  button.textContent = connected ? formattedAddress : '连接钱包';
+  button.style.background = connected 
+    ? 'linear-gradient(45deg, #27ae60, #219a52)' 
+    : 'linear-gradient(45deg, #2ecc71, #1abc9c)';
+}
 
-    const connectButton = document.getElementById('connectButton');
-    const transferButton = document.getElementById('transferButton');
-    const balanceSpan = document.getElementById('balance');
+// 添加交易记录
+function addTransactionLog(message) {
+  const logDiv = document.createElement('div');
+  logDiv.textContent = `🔖 ${new Date().toLocaleString()} - ${message}`;
+  document.getElementById('transactionList').prepend(logDiv);
+}
 
-    let walletAddress;
+// 更新总铸造量
+async function updateTotalMinted() {
+  if (!web3) return;
+  try {
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+    const total = await contract.methods.totalSupply().call();
+    document.getElementById('totalMinted').textContent = 
+      web3.utils.fromWei(total, 'ether');
+  } catch (error) {
+    console.error('获取总数失败:', error);
+  }
+}
 
-    connectButton.addEventListener('click', async () => {
-        console.log('Connect button clicked');
-        walletAddress = await connectWallet();
-        if (walletAddress) {
-            console.log('Wallet connected:', walletAddress);
-            connectButton.innerText = formatAddress(walletAddress);
-            const balance = await checkBalance(walletAddress);
-            balanceSpan.innerText = balance;
-        }
-    });
+// 定期更新数据
+setInterval(updateTotalMinted, 15000);
 
-    transferButton.addEventListener('click', async () => {
-        console.log('Transfer button clicked');
-        const recipient = document.getElementById('recipient').value;
-        const amount = document.getElementById('amount').value;
-        if (!recipient || !amount) {
-            alert('请输入接收者地址和转账金额');
-            return;
-        }
-
-        const transferResult = await transferEther(recipient, amount);
-        alert(transferResult);
-    });
+// 添加钱包地址变更监听
+window.ethereum.on('accountsChanged', (accounts) => {
+  if (accounts.length > 0) {
+    updateButtonState(true, accounts[0]);
+  } else {
+    updateButtonState(false);
+  }
 });
