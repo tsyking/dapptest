@@ -1,0 +1,33 @@
+/* 移动端样式 */
+@media (max-width: 768px) {
+  #mintButton {
+    width: 90%;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+    position: fixed;
+    bottom: 25px;
+    left: 5%;
+    border-radius: 12px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-height: 50px;
+    touch-action: manipulation;
+  }
+  
+  #connectButton {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    z-index: 1000;
+  }
+}
+
+/* 基础按钮样式 */
+button {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  color: white;
+}
